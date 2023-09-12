@@ -36,7 +36,11 @@ namespace ContosoUniversity.Controllers
             }
 
             var student = await _context.Students
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(s => s.Enrollments)
+                    .ThenInclude(e => e.Course)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
+
             if (student == null)
             {
                 return NotFound();
@@ -56,7 +60,7 @@ namespace ContosoUniversity.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,LastName,FirstMidName,EnrollmentDate")] Student student)
+        public async Task<IActionResult> Create([Bind("ID,LastName,FirstMidName,EnrollmentDate")] Student student)
         {
             if (ModelState.IsValid)
             {
@@ -90,7 +94,7 @@ namespace ContosoUniversity.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,LastName,FirstMidName,EnrollmentDate")] Student student)
         {
-            if (id != student.Id)
+            if (id != student.ID)
             {
                 return NotFound();
             }
@@ -104,7 +108,7 @@ namespace ContosoUniversity.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!StudentExists(student.Id))
+                    if (!StudentExists(student.ID))
                     {
                         return NotFound();
                     }
@@ -127,7 +131,7 @@ namespace ContosoUniversity.Controllers
             }
 
             var student = await _context.Students
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (student == null)
             {
                 return NotFound();
@@ -157,7 +161,7 @@ namespace ContosoUniversity.Controllers
 
         private bool StudentExists(int id)
         {
-          return (_context.Students?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Students?.Any(e => e.ID == id)).GetValueOrDefault();
         }
     }
 }
