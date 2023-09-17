@@ -31,7 +31,7 @@ namespace ContosoUniversity.Controllers
         // GET: Courses/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Courses == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -48,11 +48,16 @@ namespace ContosoUniversity.Controllers
             return View(course);
         }
 
+        // GET: Courses/Create
         public IActionResult Create()
         {
             PopulateDepartmentsDropDownList();
             return View();
         }
+
+        // POST: Courses/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CourseID,Credits,DepartmentID,Title")] Course course)
@@ -66,6 +71,8 @@ namespace ContosoUniversity.Controllers
             PopulateDepartmentsDropDownList(course.DepartmentID);
             return View(course);
         }
+
+        // GET: Courses/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -83,6 +90,10 @@ namespace ContosoUniversity.Controllers
             PopulateDepartmentsDropDownList(course.DepartmentID);
             return View(course);
         }
+
+        // POST: Courses/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPost(int? id)
@@ -115,6 +126,7 @@ namespace ContosoUniversity.Controllers
             PopulateDepartmentsDropDownList(courseToUpdate.DepartmentID);
             return View(courseToUpdate);
         }
+
         private void PopulateDepartmentsDropDownList(object selectedDepartment = null)
         {
             var departmentsQuery = from d in _context.Departments
@@ -122,6 +134,7 @@ namespace ContosoUniversity.Controllers
                                    select d;
             ViewBag.DepartmentID = new SelectList(departmentsQuery.AsNoTracking(), "DepartmentID", "Name", selectedDepartment);
         }
+
         // GET: Courses/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -156,14 +169,14 @@ namespace ContosoUniversity.Controllers
             {
                 _context.Courses.Remove(course);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CourseExists(int id)
         {
-          return (_context.Courses?.Any(e => e.CourseID == id)).GetValueOrDefault();
+            return _context.Courses.Any(e => e.CourseID == id);
         }
     }
 }
